@@ -1,0 +1,36 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "jacoco"
+apply plugin: "checkstyle"
+
+group = 'com.KWONSEONGCHEOL'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation "org.springframework.boot:spring-boot-starter-web"
+//	implementation "org.springframework.data:spring-data-redis:2.0.3.RELEAS"
+	implementation "redis.clients:jedis:2.9.0"
+	implementation "org.springframework.boot:spring-boot-starter-data-redis"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+
+jacocoTestCoverageVerification {
+	violationRules {
+
+		rule{
+			limit {
+				minimum = 0.2
+				}
+		}			
+	}
+}
