@@ -4,6 +4,6 @@
 
 CALCULATOR_PORT=$(docker-compose port calculator 8090 | cut -d: -f2)
 echo $CALCULATOR_PORT
-test $(curl --silent localhost:$CALCULATOR_PORT/sum?a=10\&b=20) -eq 30
+test $(curl --silent 172.24.0.1:$CALCULATOR_PORT/sum?a=10\&b=20) -eq 30
 echo 1
 
