@@ -1,76 +1,80 @@
 pipeline {
-    triggers {
+        triggers{
         pollSCM('*/5 * * * *')
     }
     agent any
     stages {
-        stage ('checkout'){
+        stage ('checkout') {
             steps {
-                git url: 'https://github.com/juht/calculator.git'
+                git url :'https://github.com/KWONSEONGCHEOL/calculator2.git'
             }
         }
-        stage ('Compile'){
+      stage('Compile'){
             steps {
                 sh './gradlew compileJava'
             }
         }
-        stage ('Unit Test'){
+        stage ('Unit test') {
             steps {
-                sh "./gradlew test"
+                sh './gradlew test'
             }
         }
-        stage("Code coverage") {
+        stage ("code coverage") {
             steps {
                 sh "./gradlew jacocoTestReport"
-                /* publishHTML (target: [
-                    reportDir: 'build/reports/jacoco/test/html',
-                    reportFile: 'index.html',
-                    reportName: "JaCoCo Report"
-                ]) */
                 sh "./gradlew jacocoTestCoverageVerification"
+                
             }
         }
-        stage("Static Code Coverage"){
+        stage ("Static code analysis") {
             steps {
                 sh "./gradlew checkstyleMain"
-                /*publishHTML ( target: [
+                publishHTML (target: [
                     reportDir: 'build/reports/checkstyle/',
-                    reportFile: 'main.html',
-                    reportName: "CheckStyle Report"
-                ]) */
+                    reportFiles: 'main.html',
+                    reportName: "checkstyle Report"])
             }
         }
-        stage ("Package"){
+        stage("Package"){
             steps {
                 sh "./gradlew build"
             }
         }
-        stage ("Docker build") {
+        
+        stage("Docker build"){
             steps {
-                sh "docker build -t localhost:5000/juht/calculator ."
+                sh "docker build -t localhost:5000/kwonseongcheol/calculator ."
             }
         }
-        stage ("Docker push"){
+       stage("Docker push"){
             steps {
-                sh "docker push localhost:5000/juht/calculator"
+                sh "docker push localhost:5000/kwonseongcheol/calculator"
             }
         }
-        stage ("Deploy to staging"){
+        stage("Deploy to staging") {
             steps {
-                sh "docker run -d --rm -p 8090:8090 \
-                    --name calculator localhost:5000/juht/calculator"
+               /* sh "docker run -d --rm -p 8090:8090 \
+                --name calculator localhost:5000/kwonseongcheol/calculator"*/
+                 sh "docker-compose up -d"
             }
         }
-        stage ("Acceptance Test"){
+       stage("Acceptance test") {
             steps {
-                sleep 60
+                sleep 20
                 sh "./acceptance_test.sh"
+                
             }
         }
+
+        
     }
     post {
         always {
-            sh "docker stop calculator"
+          /*  mail to : "zx7613@naver.com",
+            subject : "Completed Pipeline : ${currentBuild.fullDisplayName}",
+            body: "Your build completed, please check: ${env.BUILD_URL}"*/
+        //    sh "docker stop calculator"
+            sh "docker-compose down"
         }
     }
 }
